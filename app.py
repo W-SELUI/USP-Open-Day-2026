@@ -4,7 +4,8 @@ from uuid import uuid4
 
 import streamlit as st
 
-from career_model import EXCLUDED_CAREERS, predict_careers
+import importlib
+import threading
 from career_cards import career_card
 from career_reveal import REVEAL_ASSETS, render_future_reveal
 from career_inputs import (
@@ -23,6 +24,22 @@ from UI_theme import apply_theme
 
 
 st.set_page_config(page_title="NeuroVerse", page_icon="🧠")
+
+# The career model is trained when `career_model` is first imported (a couple
+# of seconds, longer on a small cloud server). Importing it at the top of the
+# file made every visitor wait on the home page. Instead, start training in
+# the background once per server process; Career Quest imports it when needed.
+@st.cache_resource(show_spinner=False)
+def _start_career_model_warmup() -> bool:
+    threading.Thread(
+        target=importlib.import_module,
+        args=("career_model",),
+        daemon=True,
+    ).start()
+    return True
+
+
+_start_career_model_warmup()
 
 apply_theme()
 
@@ -1538,6 +1555,8 @@ elif page == "career":
     # after a student changes their choices, free text, or nickname.
     profile = (subjects, hobbies, name.strip())
     saved_result = st.session_state.get("career_result")
+    from career_model import EXCLUDED_CAREERS, predict_careers
+
     if saved_result and (
         saved_result["profile"] != profile
         or any(p["career"] in EXCLUDED_CAREERS for p in saved_result["result"]["predictions"])
