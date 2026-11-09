@@ -759,31 +759,16 @@ if page == "home":
         )
         del st.session_state.quest_pass_notice
 
-    st.markdown(
-        """
-        <section class="hero">
-            <div class="eyebrow">NEUROVERSE · OPEN DAY EXPERIENCE</div>
-            <h1>Your mind. Your moves. Your universe.</h1>
-            <p>
-                Enter a universe of machine-learning predictions,
-                hand-tracked challenges, and playful social experiences.
-            </p>
-        </section>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # QuestPass is a visible progress board, not a separate activity. Visitors
-    # can see their stamp hunt before choosing what to try next.
+    # ----- Home: compact hero + QuestPass side by side, then games grouped -----
     stamp_count = len(st.session_state.quest_stamps)
     total_stamps = len(QUEST_STAMPS)
     progress_percent = round((stamp_count / total_stamps) * 100)
+
+    # Locked stamps show the game's icon greyed out; collected ones light up.
     stamp_markup = "".join(
-        (
-            f'<div class="quest-stamp collected"><span>{icon}</span>{title}</div>'
-            if activity in st.session_state.quest_stamps
-            else f'<div class="quest-stamp"><span>○</span>{title}</div>'
-        )
+        f'<div class="quest-stamp{" collected" if activity in st.session_state.quest_stamps else ""}" '
+        f'title="{title}{" (collected)" if activity in st.session_state.quest_stamps else " (locked)"}">'
+        f'<span class="quest-stamp-icon">{icon}</span><span class="quest-stamp-name">{title}</span></div>'
         for activity, (icon, title) in QUEST_STAMPS.items()
     )
 
@@ -800,163 +785,88 @@ if page == "home":
 
     st.markdown(
         f"""
-        <section class="questpass-card">
-            <div class="questpass-copy">
-                <p class="questpass-eyebrow">NEUROVERSE EXPERIENCE PASSPORT</p>
-                <h2>NeuroVerse QuestPass</h2>
-                <p>Explore the universe, collect stamps, and unlock a completely unnecessary title.</p>
-            </div>
-            <div class="questpass-progress-area">
-                <div class="questpass-count">{stamp_count} <span>/ {total_stamps} stamps</span></div>
+        <div class="home-top">
+            <section class="hero">
+                <div class="eyebrow">NEUROVERSE · OPEN DAY EXPERIENCE</div>
+                <h1>Your mind. Your moves. Your universe.</h1>
+                <p>
+                    Machine-learning predictions, hand-tracked games and playful
+                    social experiences. Pick one below and jump in.
+                </p>
+            </section>
+            <section class="questpass-card">
+                <p class="questpass-eyebrow">QUESTPASS</p>
+                <div class="questpass-count">{stamp_count}<span> / {total_stamps} stamps</span></div>
                 <div class="questpass-track"><div style="width: {progress_percent}%"></div></div>
-                <p>{quest_message}</p>
-            </div>
-            <div class="quest-stamp-row">{stamp_markup}</div>
-        </section>
+                <p class="questpass-message">{quest_message}</p>
+                <div class="quest-stamp-row">{stamp_markup}</div>
+            </section>
+        </div>
         """,
         unsafe_allow_html=True,
     )
 
-    puzzle_column, rush_column = st.columns(2, gap="large")
+    def render_game_card(game: dict) -> None:
+        """One clickable game card. The button sits inside the card."""
+        with st.container(key=f"game_card_{game['page']}"):
+            st.markdown(
+                f"""
+                <div class="game-card-body">
+                    <div class="game-icon">{game['icon']}</div>
+                    <h3>{game['name']}</h3>
+                    <p class="game-tag">{game['tag']}</p>
+                    <p class="game-desc">{game['desc']}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button(game["button"], key=game["key"], width="stretch"):
+                st.session_state.page = game["page"]
+                st.rerun()
 
-    with puzzle_column:
-        st.markdown(
-            """
-            <div class="mode-card">
-                <div class="mode-icon">🧩</div>
-                <h2>Hand Puzzle</h2>
-                <p>
-                    Use hand tracking and pinching gestures to solve a
-                    live camera puzzle.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    camera_games = [
+        {"page": "puzzle", "key": "open_puzzle", "icon": "🧩", "name": "Hand Puzzle",
+         "tag": "Move it with your hands", "button": "Play",
+         "desc": "Pinch and drag pieces to rebuild a live camera puzzle."},
+        {"page": "hand_rush", "key": "open_hand_rush", "icon": "⚡", "name": "Gravity Thief",
+         "tag": "Steal the core. Beat the lasers.", "button": "Play",
+         "desc": "Bend gravity with your hand to guide the core into the portal."},
+        {"page": "slice_club", "key": "open_slice_club", "icon": "🍉", "name": "Slice Club",
+         "tag": "Slice fast. Dodge bombs.", "button": "Play",
+         "desc": "Your finger is the blade. Chase the best 30-second score."},
+        {"page": "skyshot", "key": "open_skyshot", "icon": "🎯", "name": "SkyShot",
+         "tag": "Raise your hand. Take the shot.", "button": "Play",
+         "desc": "Aim with your hand, hit flying targets and skip the decoys."},
+        {"page": "vibe_oracle", "key": "open_vibe_oracle", "icon": "🔮", "name": "Vibe Oracle",
+         "tag": "Ask the future something harmless", "button": "Play",
+         "desc": "Raise a hand to wake the crystal and hear your future."},
+    ]
+    other_games = [
+        {"page": "career", "key": "open_career", "icon": "🎓", "name": "Career Quest",
+         "tag": "AI · Your next direction", "button": "Find my career",
+         "desc": "Tell our trained model what you enjoy, then see career matches from this project's training data."},
+        {"page": "vibe_link", "key": "open_vibe_link", "icon": "✨", "name": "VibeLink",
+         "tag": "Social · Two strangers. One verdict.", "button": "Start VibeLink",
+         "desc": "Two visitors from different schools answer in secret. VibeLink decides: match or no match."},
+    ]
 
-        if st.button("Play the Hand Puzzle", key="open_puzzle"):
-            st.session_state.page = "puzzle"
-            st.rerun()
+    st.markdown(
+        '<div class="game-section-title"><span>📷</span> Camera games '
+        '<small>Hand tracking · camera stays on this device</small></div>',
+        unsafe_allow_html=True,
+    )
+    with st.container(key="game_grid_camera"):
+        for game in camera_games:
+            render_game_card(game)
 
-    with rush_column:
-        st.markdown(
-            """
-            <div class="mode-card">
-                <div class="mode-icon">⚡</div>
-                <h2>Gravity Thief</h2>
-                <p>
-                    Use a hand-controlled gravity field to guide a stolen core
-                    past security lasers and into the portal.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        if st.button("Play Gravity Thief", key="open_hand_rush"):
-            st.session_state.page = "hand_rush"
-            st.rerun()
-
-    career_column, vibe_link_column = st.columns(2, gap="large")
-
-    with career_column:
-        st.markdown(
-            """
-            <div class="mode-card">
-                <div class="mode-icon">🎓</div>
-                <h2>Career Quest</h2>
-                <p>
-                    Tell our trained model what you enjoy, then see simple
-                    career matches from this project's training data.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        if st.button("Explore Career Quest", key="open_career"):
-            st.session_state.page = "career"
-            st.rerun()
-
-    with vibe_link_column:
-        st.markdown(
-            """
-            <div class="mode-card">
-                <div class="mode-icon">✨</div>
-                <h2>VibeLink</h2>
-                <p>
-                    Two strangers from different schools answer in secret.
-                    VibeLink delivers the final verdict: match or no match.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        if st.button("Start VibeLink", key="open_vibe_link"):
-            st.session_state.page = "vibe_link"
-            st.rerun()
-
-    oracle_column, slice_column = st.columns(2, gap="large")
-
-    with oracle_column:
-        st.markdown(
-            """
-            <div class="mode-card">
-                <div class="mode-icon">🔮</div>
-                <h2>Vibe Oracle</h2>
-                <p>
-                    Raise one hand, awaken the crystal, and let the Oracle
-                    reveal the harmless chaos hiding in your future.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        if st.button("Ask the Vibe Oracle", key="open_vibe_oracle"):
-            st.session_state.page = "vibe_oracle"
-            st.rerun()
-
-    with slice_column:
-        st.markdown(
-            """
-            <div class="mode-card">
-                <div class="mode-icon">🍉</div>
-                <h2>Slice Club</h2>
-                <p>
-                    Turn your index finger into a blade, slice flying fruit,
-                    dodge bombs, and chase the highest 30-second score.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        if st.button("Enter Slice Club", key="open_slice_club"):
-            st.session_state.page = "slice_club"
-            st.rerun()
-
-    sky_left, skyshot_column, sky_right = st.columns([1, 2, 1], gap="large")
-
-    with skyshot_column:
-        st.markdown(
-            """
-            <div class="mode-card">
-                <div class="mode-icon">🎯</div>
-                <h2>SkyShot</h2>
-                <p>
-                    Turn your hand into a steady arcade blaster, track flying
-                    targets, dodge decoys, and chase the highest 30-second score.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        if st.button("Enter SkyShot", key="open_skyshot"):
-            st.session_state.page = "skyshot"
-            st.rerun()
+    st.markdown(
+        '<div class="game-section-title"><span>🧠</span> AI &amp; social '
+        '<small>No camera needed</small></div>',
+        unsafe_allow_html=True,
+    )
+    with st.container(key="game_grid_other"):
+        for game in other_games:
+            render_game_card(game)
 
     st.markdown(
         '<p class="small-note">NEUROVERSE · Built for Open Day · Designed for quick, private play.</p>',

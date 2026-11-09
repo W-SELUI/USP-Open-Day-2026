@@ -1,2 +1,6 @@
 [server]
 enableStaticServing = true
+
+[client]
+# Kiosk mode: hide the Deploy button and developer menu from visitors.
+toolbarMode = "minimal"

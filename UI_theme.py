@@ -689,12 +689,349 @@ def apply_theme():
             .career-result-stage { border-radius: 23px; }
         }
 
+        /* ===== Game screens: slim top bar for "Back to NeuroVerse" =====
+           The back button used to float on top of each game's own header.
+           On game routes it now sits in a 52px bar and the game starts
+           below it, so nothing is covered. Career Quest is a normal page
+           and is not affected. */
+        :root { --game-bar-h: 52px; }
+
+        .st-key-back_from_puzzle,
+        .st-key-back_from_hand_rush,
+        .st-key-back_from_slice_club,
+        .st-key-back_from_skyshot,
+        .st-key-back_from_vibe_link,
+        .st-key-back_from_vibe_oracle {
+            position: fixed !important;
+            inset: 0 0 auto 0 !important;
+            z-index: 1000000 !important;
+            display: flex !important;
+            align-items: center !important;
+            width: 100vw !important;
+            height: var(--game-bar-h) !important;
+            margin: 0 !important;
+            padding: 0 14px !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(3, 7, 18, 0.88);
+            backdrop-filter: blur(12px);
+        }
+
+        .st-key-back_from_puzzle button,
+        .st-key-back_from_hand_rush button,
+        .st-key-back_from_slice_club button,
+        .st-key-back_from_skyshot button,
+        .st-key-back_from_vibe_link button,
+        .st-key-back_from_vibe_oracle button {
+            width: auto !important;
+            min-height: 36px !important;
+            margin: 0 !important;
+            padding: 0 16px !important;
+            border: 1px solid rgba(148, 163, 184, 0.28) !important;
+            border-radius: 999px !important;
+            background: rgba(255, 255, 255, 0.06) !important;
+            box-shadow: none !important;
+            color: #e6edf6 !important;
+            font-size: 0.88rem !important;
+            font-weight: 700 !important;
+        }
+
+        .st-key-back_from_puzzle button:hover,
+        .st-key-back_from_hand_rush button:hover,
+        .st-key-back_from_slice_club button:hover,
+        .st-key-back_from_skyshot button:hover,
+        .st-key-back_from_vibe_link button:hover,
+        .st-key-back_from_vibe_oracle button:hover {
+            border-color: var(--lab-cyan) !important;
+            background: rgba(103, 232, 249, 0.14) !important;
+            transform: none !important;
+        }
+
+        /* Games that scroll with the page: start them below the bar */
+        [data-testid="stMain"]:has(.st-key-back_from_puzzle, .st-key-back_from_hand_rush, .st-key-back_from_slice_club, .st-key-back_from_skyshot) .block-container {
+            padding-top: var(--game-bar-h) !important;
+        }
+
+        [data-testid="stMain"]:has(.st-key-back_from_puzzle, .st-key-back_from_hand_rush, .st-key-back_from_slice_club, .st-key-back_from_skyshot) .block-container [data-testid="stVerticalBlock"] {
+            gap: 0 !important;
+        }
+
+        [data-testid="stMain"]:has(.st-key-back_from_puzzle, .st-key-back_from_hand_rush, .st-key-back_from_slice_club, .st-key-back_from_skyshot) iframe {
+            min-height: calc(100vh - var(--game-bar-h)) !important;
+        }
+
+        /* Games pinned to the viewport: move the frame down by the bar */
+        [data-testid="stMain"]:has(.st-key-back_from_vibe_link, .st-key-back_from_vibe_oracle) iframe[title="st.iframe"],
+        [data-testid="stMain"]:has(.st-key-back_from_vibe_link, .st-key-back_from_vibe_oracle) [data-testid="stIFrame"],
+        [data-testid="stMain"]:has(.st-key-back_from_vibe_link, .st-key-back_from_vibe_oracle) [data-testid="stCustomComponentV1"],
+        [data-testid="stMain"]:has(.st-key-back_from_vibe_link, .st-key-back_from_vibe_oracle) [data-testid="stCustomComponentV1"] iframe {
+            top: var(--game-bar-h) !important;
+            height: calc(100vh - var(--game-bar-h)) !important;
+            min-height: 0 !important;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
             }
+        }
+        /* ===== Home page layout (compact hero + QuestPass, grouped game cards) ===== */
+        .home-top {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr);
+            gap: 1.1rem;
+            align-items: stretch;
+            margin: 0.4rem 0 1.6rem;
+        }
+
+        .home-top .hero {
+            margin: 0;
+            padding: 2.3rem 2.5rem;
+            text-align: left;
+        }
+
+        .home-top .hero h1 {
+            font-size: clamp(2.3rem, 4.6vw, 3.7rem);
+            line-height: 0.98;
+        }
+
+        .home-top .hero p {
+            max-width: 520px;
+            margin: 1rem 0 0;
+            font-size: 1rem;
+        }
+
+        .home-top .questpass-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0;
+            margin: 0;
+            padding: 1.5rem 1.6rem;
+        }
+
+        .home-top .questpass-count {
+            font-size: 2.3rem;
+            line-height: 1;
+        }
+
+        .questpass-message {
+            margin: 0.7rem 0 1rem !important;
+            color: #c7d7ee;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .home-top .quest-stamp-row {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 52px));
+            gap: 0.45rem;
+        }
+
+        .home-top .quest-stamp {
+            display: grid;
+            aspect-ratio: 1;
+            padding: 0;
+            border-radius: 14px;
+            place-items: center;
+            font-size: 1.35rem;
+        }
+
+        .home-top .quest-stamp .quest-stamp-icon {
+            filter: grayscale(1);
+            opacity: 0.32;
+            transition: opacity 200ms ease, filter 200ms ease;
+        }
+
+        .home-top .quest-stamp.collected {
+            border-color: rgba(103, 232, 249, 0.7);
+            background: rgba(8, 145, 178, 0.22);
+            box-shadow: 0 0 18px rgba(103, 232, 249, 0.28);
+        }
+
+        .home-top .quest-stamp.collected .quest-stamp-icon {
+            filter: none;
+            opacity: 1;
+        }
+
+        .quest-stamp-name {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+        }
+
+        /* Section headings above each group of games */
+        .game-section-title {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.35rem 0.7rem;
+            margin: 1.4rem 0 0.75rem;
+            color: var(--lab-ink);
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .game-section-title small {
+            color: var(--lab-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        /* Card grids */
+        .st-key-game_grid_camera,
+        .st-key-game_grid_other {
+            display: grid !important;
+            gap: 0.9rem !important;
+        }
+
+        .st-key-game_grid_camera {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .st-key-game_grid_other {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        /* Game cards: each one uses its game's accent colour */
+        .st-key-game_card_puzzle { --accent: #67e8f9; }
+        .st-key-game_card_hand_rush { --accent: #a78bfa; }
+        .st-key-game_card_slice_club { --accent: #fb7185; }
+        .st-key-game_card_skyshot { --accent: #38bdf8; }
+        .st-key-game_card_vibe_oracle { --accent: #6ee7b7; }
+        .st-key-game_card_career { --accent: #f5dc85; }
+        .st-key-game_card_vibe_link { --accent: #c4b5fd; }
+
+        [class*="st-key-game_card_"] {
+            position: relative;
+            overflow: hidden;
+            justify-content: space-between;
+            gap: 0.9rem !important;
+            height: 100%;
+            padding: 1.15rem;
+            border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+            border-radius: 20px;
+            background:
+                radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 55%),
+                linear-gradient(160deg, rgba(22, 40, 78, 0.9), rgba(8, 16, 36, 0.92));
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.26), inset 0 1px rgba(255, 255, 255, 0.05);
+            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        [class*="st-key-game_card_"]:hover {
+            border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+            box-shadow: 0 20px 46px rgba(0, 0, 0, 0.34), 0 0 28px color-mix(in srgb, var(--accent) 22%, transparent);
+            transform: translateY(-4px);
+        }
+
+        .game-card-body .game-icon {
+            display: grid;
+            width: 48px;
+            height: 48px;
+            border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+            border-radius: 14px;
+            background: color-mix(in srgb, var(--accent) 16%, rgba(2, 6, 23, 0.6));
+            box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 18%, transparent);
+            font-size: 1.6rem;
+            place-items: center;
+        }
+
+        .game-card-body h3 {
+            margin: 0.85rem 0 0.15rem;
+            padding: 0;
+            color: var(--lab-ink);
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .game-card-body .game-tag {
+            margin: 0 0 0.5rem;
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .game-card-body .game-desc {
+            margin: 0;
+            color: var(--lab-muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        [class*="st-key-game_card_"] .stButton > button {
+            min-height: 44px;
+            margin: 0;
+            border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+            border-radius: 12px;
+            background: color-mix(in srgb, var(--accent) 14%, rgba(2, 6, 23, 0.55));
+            box-shadow: none;
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        [class*="st-key-game_card_"] .stButton > button:hover,
+        [class*="st-key-game_card_"]:hover .stButton > button {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #04101f;
+            filter: none;
+            transform: none;
+        }
+
+        .st-key-game_grid_other [class*="st-key-game_card_"] .game-card-body {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            column-gap: 1rem;
+        }
+
+        .st-key-game_grid_other .game-card-body .game-icon {
+            grid-row: span 3;
+            width: 56px;
+            height: 56px;
+            font-size: 1.9rem;
+        }
+
+        .st-key-game_grid_other .game-card-body h3 {
+            margin-top: 0.1rem;
+        }
+
+        .home-top .questpass-card { text-align: left; align-items: stretch; }
+        .home-top .questpass-track { width: 100%; }
+
+        /* Equal-height cards with the button pinned to the bottom */
+        .st-key-game_grid_camera,
+        .st-key-game_grid_other { align-items: stretch !important; }
+        .st-key-game_grid_camera > div,
+        .st-key-game_grid_other > div { display: flex; height: auto !important; align-self: stretch !important; }
+        .st-key-game_grid_camera > div > [class*="st-key-game_card_"],
+        .st-key-game_grid_other > div > [class*="st-key-game_card_"] { flex: 1 1 auto; }
+        [class*="st-key-game_card_"] { display: flex !important; flex-direction: column; }
+        [class*="st-key-game_card_"] > div:first-child { flex: 1 1 auto; }
+        .game-card-body { padding-bottom: 0.4rem; }
+
+        @media (max-width: 1050px) {
+            .st-key-game_grid_camera { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 860px) {
+            .home-top { grid-template-columns: 1fr; }
+            .home-top .hero { padding: 1.8rem 1.6rem; }
+        }
+
+        @media (max-width: 640px) {
+            .st-key-game_grid_camera,
+            .st-key-game_grid_other { grid-template-columns: 1fr 1fr; }
+            .st-key-game_grid_other { grid-template-columns: 1fr; }
+            .game-card-body .game-desc { display: none; }
+            [class*="st-key-game_card_"] { padding: 0.95rem; }
+            .home-top .quest-stamp { font-size: 1.15rem; border-radius: 11px; }
+            .st-key-game_grid_camera > div:last-child:nth-child(odd) { grid-column: span 2; }
         }
         </style>
         """,
