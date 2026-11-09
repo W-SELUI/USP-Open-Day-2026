@@ -19,6 +19,7 @@ from questpass_bridge import (
     render_gravity_thief_activity,
     render_hand_puzzle_activity,
     render_questpass_activity,
+    render_static_iframe,
 )
 from UI_theme import apply_theme
 
@@ -1441,11 +1442,7 @@ elif page == "vibe_oracle":
     if not vibe_oracle_file.exists():
         st.error("The rebuilt Vibe Oracle files could not be found.")
     else:
-        st.iframe(
-            "/app/static/vibe-oracle/index.html",
-            height="stretch",
-            width="stretch",
-        )
+        render_static_iframe("/app/static/vibe-oracle/index.html", height="stretch")
         completion = _vibe_oracle_completion_listener(
             data={"activity": "vibe_oracle"},
             default=None,
