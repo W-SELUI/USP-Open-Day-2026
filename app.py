@@ -887,6 +887,11 @@ if page == "home":
             render_game_card(game)
 
     st.markdown(
+        '<div class="support-row">'
+        '<a class="support-pill" href="https://ko-fi.com/selui" target="_blank" rel="noopener noreferrer">'
+        '<span>☕</span> Buy me a coffee</a>'
+        '<span class="support-text">Enjoying NeuroVerse? A small tip helps keep it online.</span>'
+        '</div>'
         '<p class="small-note">NEUROVERSE · Built for Open Day · Designed for quick, private play.</p>',
         unsafe_allow_html=True,
     )

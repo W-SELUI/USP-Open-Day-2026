@@ -769,6 +769,42 @@ def apply_theme():
             min-height: 0 !important;
         }
 
+        /* Ko-fi support link in the home footer */
+        .support-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem 0.9rem;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0 0.4rem;
+        }
+
+        .support-pill {
+            display: inline-flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.6rem 1.1rem;
+            border: 1px solid rgba(245, 220, 133, 0.55);
+            border-radius: 999px;
+            background: rgba(245, 220, 133, 0.10);
+            color: #f8e7a6 !important;
+            font-weight: 800;
+            text-decoration: none !important;
+            transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+        }
+
+        .support-pill:hover {
+            border-color: #f5dc85;
+            background: #f5dc85;
+            color: #1a1405 !important;
+            transform: translateY(-2px);
+        }
+
+        .support-text {
+            color: var(--lab-muted);
+            font-size: 0.9rem;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
