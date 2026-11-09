@@ -73,6 +73,26 @@ def render_gravity_thief_activity(*, key: str):
     return _gravity_thief(default=None, key=key)
 
 
+def render_static_iframe(url: str, height: int | str = 760) -> None:
+    """Show a page from Streamlit's ``static`` folder inside an iframe.
+
+    ``st.iframe("/app/static/...")`` uses an absolute path. That works
+    locally, but on Streamlit Community Cloud the app itself runs under
+    ``/~/+/``, so ``/app/static/...`` points at the Cloud wrapper page
+    instead of the game and the frame just keeps loading. A relative
+    ``app/static/...`` address resolves correctly in both places.
+    """
+    relative_src = url.lstrip("/")
+    css_height = f"{height}px" if isinstance(height, int) else "100vh"
+    st.markdown(
+        f'''<iframe title="st.iframe" class="nv-static-frame" src="{relative_src}"
+            allow="camera; microphone; autoplay; fullscreen; clipboard-write"
+            allowfullscreen
+            style="display:block;width:100%;height:{css_height};border:0;"></iframe>''',
+        unsafe_allow_html=True,
+    )
+
+
 def render_questpass_activity(
     html_file: Path | None,
     activity: str,
@@ -87,7 +107,7 @@ def render_questpass_activity(
     message, so a display issue in the listener cannot blank the activity.
     """
     if game_url:
-        st.iframe(game_url, height=760, width="stretch")
+        render_static_iframe(game_url, height=760)
     else:
         if html_file is None:
             raise ValueError("html_file is required when game_url is not provided")
